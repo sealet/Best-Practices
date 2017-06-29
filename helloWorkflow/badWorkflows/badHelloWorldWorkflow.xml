@@ -1,0 +1,28 @@
+<workflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://levelsbeyond.com/schema/workflow"
+  xmlns:nimbus="http://levelsbeyond.com/schema/workflow/nimbus"
+  xsi:schemaLocation="http://levelsbeyond.com/schema/workflow http://www.levelsbeyond.com/schema/latest/studio.xsd"
+  id="helloWorldWorkflow"
+  name="Hello World Workflow"
+  description=""
+  executionLabelExpression=""
+  deadlineExpression=""
+  subjectDOClassName=""
+  resultDataDef="helloWorld"
+  showInUserInterface="true"
+  sdkVersion="5.4">
+  <initialStepName>check allowSubflowProcessing</initialStepName>
+  <noopStep name="check allowSubflowProcessing">
+    <transition condition="${allowSubflowProcessing}"><targetStepName>set helloWorld</targetStepName></transition>
+    <transition condition="${true}"><targetStepName>end</targetStepName></transition>
+  </noopStep>
+  <groovyStep name="set helloWorld" resultDataDef="helloWorld" nextStep="end">
+    <script>
+            <![CDATA[ def helloStringArray = helloWorkflow.split(" ")
+     def helloWorldString = ""
+                        if (helloStringArray[0].toLowerCase().equals("groovy")){helloWorldString = helloStringArray[1] + " World"}
+              else{helloWorldString = helloStringArray[0] + " World"}
+                                                                                              return helloWorldString ]]>
+</script></groovyStep><noopStep name="end"/>
+  <contextDataDef name="allowSubflowProcessing" dataType="Boolean" defaultDataExpression="${true}"/><contextDataDef name="helloWorkflow" dataType="String"/>
+  <contextDataDef name="helloWorld" dataType="String" defaultDataExpression="${helloWorkflow}"></contextDataDef></workflow>
