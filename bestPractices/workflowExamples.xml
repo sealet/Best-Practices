@@ -1,0 +1,57 @@
+Examples:
+    
+    EXAMPLE 1
+<noopStep name="check if file exists"
+  executionLabelExpression="Check if ${yourFile.absolutePath} exists"
+  >
+  <transition condition="${yourFile.exists()}"><!-- if this condition is true, continue processing -->
+    <targetStepName>continue processing</targetStepName>
+  </transition>
+  <transition condition="${true}">\<!-- if the above condition is false, default to true here | ALWAYS HAVE THE LAST TRANSITION DEFAULT TRUE -->
+    <targetStepName>error handling / fail step</targetStepName>
+  </transition>
+</noopStep>
+  
+  
+    EXAMPLE 2
+<setContextData name="determine media type"
+  targetDataDef="mediaType"
+  valueExpression="${#mediaType(yourFile)}"
+  executionLabelExpression="The file ${yourFile.name} is a ${mediaType}"
+  >
+  <transition condition="${mediaType == 'VIDEO'}">
+    <targetStepName>ingest video asset</targetStepName>
+  </transition>
+  <transition condition="${mediaType == 'AUDIO'}">
+    <targetStepName>ingest audio asset</targetStepName>
+  </transition>
+  <transition condition="${mediaType == 'IMAGE'}">
+    <targetStepName>ingest image asset</targetStepName>
+  </transition>
+  <transition condition="${mediaType == 'DOCUMENT'}">
+    <targetStepName>ingest document asset</targetStepName>
+  </transition>
+  <transition condition="${true}">
+    <targetStepName>ingest other asset</targetStepName>
+  </transition>
+</setContextData>
+
+
+  EXAMPLE 3 -- context data def with sysconfig
+<contextDataDef name="mySysconfig" dataType="String" defaultDataExpression="${#sysconfig('workflow.myWorkflowName.mySysconfig')}"/>
+    in dynamic props >>> workflow.myWorkflowName.mySysconfig=THE_STRING_TO_PASS_TO_WORKFLOW
+ 
+ 
+  EXAMPLE 4 -- step with a sysconfig
+<setContextData name="sysconfig in a step"
+  targetDataDef="toBecomeSysconfig"
+  valueExpression="${#sysconfig('workflow.myWorkflowName.mySysconfig')}"
+  executionLabelExpression="The value of toBecomeSysconfig is ${toBecomeSysconfig}"
+  >
+  <transition condition="${toBecomeSysconfig == #sysconfig('workflow.myWorkflowName.mySysconfig')}">
+    <targetStepName>this statement should always be true</targetStepName>
+  </transition>
+  <transition condition="${true}">
+    <targestStepName>this should never be hit</targestStepName>
+  </transition>
+</setContextData>

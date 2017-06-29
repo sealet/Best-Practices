@@ -1,0 +1,177 @@
+<!--
+  ~ Levels Beyond CONFIDENTIAL
+  ~
+  ~ Copyright 2003 - 2016 Levels Beyond Incorporated
+  ~ All Rights Reserved.
+  ~
+  ~ NOTICE:  All information contained herein is, and remains
+  ~ the property of Levels Beyond Incorporated and its suppliers,
+  ~ if any.  The intellectual and technical concepts contained
+  ~ herein are proprietary to Levels Beyond Incorporated
+  ~ and its suppliers and may be covered by U.S. and Foreign Patents,
+  ~ patents in process, and are protected by trade secret or copyright law.
+  ~ Dissemination of this information or reproduction of this material
+  ~ is unlawful and strictly forbidden unless prior written permission is obtained
+  ~ from Levels Beyond Incorporated.
+  -->
+
+<workflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://levelsbeyond.com/schema/workflow"
+    xmlns:nimbus="http://levelsbeyond.com/schema/workflow/nimbus"
+    xsi:schemaLocation="http://levelsbeyond.com/schema/workflow http://www.levelsbeyond.com/schema/latest/studio.xsd"
+    id="helloWorldWorkflow"
+    name="Hello World Workflow"
+    description="
+      
+      ********************
+      
+      If allowSubflowProcessing is 'true', then the workflow will change the value of helloWorld to 'Hello World' and return it to the parent workflow.
+      
+      ********************
+      ********************
+      
+      Subflow(s):
+           N/a
+      
+      ********************
+             *************
+             |
+             |      Variables to Subflows:
+             |            N/a
+             |
+             *************
+      ********************
+      
+      Parent Workflow(s):
+          
+            helloWorkflow
+      
+      ********************
+              ************
+              |
+              |      Variables from Parents:
+              |          
+              |           allowSubflowProcessing -- boolean
+              |           helloWorkflow -- string
+              |    
+              ************
+      ********************
+      
+      Inputs:
+          allowSubflowProcessing is passed in from the helloWorkflow parent workflow. If true, processing will take place within this workflow. If not, the workflow will end without any processing having taken place.
+          helloWorkflow is passed in from the helloWorkflow parent workflow. It will either equal 'Hello Workflow' or 'Groovy Hello'. 
+          
+      ********************
+      ********************
+      
+      Outputs:
+          The variable string helloWorld will be set to 'Hello World' after processing in this subflow and will return the variable to the helloWorkflow to complete the processing
+      
+      ********************
+      ********************
+      
+      Results:
+          Take input from helloWorkflow variable and assign the value of 'Hello World' to the helloWorld variable 
+      
+      ********************
+      
+    "
+    executionLabelExpression="allowSubflowProcessing is ${allowSubflowProcessing}. If 'true', then return 'Hello World' to parent workflow"
+    deadlineExpression=""
+    subjectDOClassName=""
+    resultDataDef="helloWorld"
+    showInUserInterface="true"
+    
+    
+    sdkVersion="5.4">
+    
+    <initialStepName>check allowSubflowProcessing</initialStepName>
+    <!-- .......................................... Check allowSubflowProcessing and Set helloWorld .......................................... -->
+    <!-- Check allowSubflowProcessing -->
+    <noopStep name="check allowSubflowProcessing"
+      executionLabelExpression="helloWorkflow == ${helloWorkflow} | Allow Subflow Processing? >>> ${allowSubflowProcessing}"
+      pctComplete="20"
+      >
+      <transition condition="${allowSubflowProcessing}">
+        <targetStepName>set helloWorld</targetStepName>
+      </transition>
+      <transition condition="${true}">
+        <targetStepName>end</targetStepName>
+      </transition>
+    </noopStep>
+    
+    
+    <!-- Parse the string passed in from parent, return 'Hello World' -->
+    <groovyStep name="set helloWorld" 
+      resultDataDef="helloWorld"
+      executionLabelExpression="Setting the value of helloWorld to ${helloWorld}"
+      nextStep="end"
+      pctComplete="98"
+      >
+      <script>
+        <![CDATA[
+          
+          def helloStringArray = helloWorkflow.split(" ")
+          def helloWorldString = ""
+              println ""
+              println "*********************************"
+              println ""
+              println "START helloWorldWorkflow" 
+              println ""
+              println "Original String: "
+              println helloWorkflow
+              println ""
+              println "Array after split: "
+              println helloStringArray.toString()
+          
+          
+          if (helloStringArray[0].toLowerCase().equals("groovy"))
+          {
+                  println ""
+                  println "helloWorkflow == 'Groovy Hello'"
+              
+              helloWorldString = helloStringArray[1] + " World"
+          
+          }
+          else{
+                  println ""
+                  println "helloWorkflow == 'Hello Workflow'"
+                  
+              helloWorldString = helloStringArray[0] + " World"
+          }
+          
+          
+               println ""
+               println "Hello World String == " + helloWorldString
+               println ""
+               println "Hello World Workflow"
+               println "END"
+               println ""
+               println "*********************************"
+
+          return helloWorldString
+        ]]>
+      </script>
+    </groovyStep>
+    
+    
+    <!-- ........................................... Ending Steps .......................................... -->
+    <noopStep name="end"
+      pctComplete="100"
+    />
+    
+    
+    
+    
+    
+    
+    
+    <!-- ........................................ Context Data Defs ........................................ -->
+    <!-- Passed in Data Defs -->
+    <contextDataDef name="allowSubflowProcessing"     dataType="Boolean"    defaultDataExpression="${true}"/>
+    <contextDataDef name="helloWorkflow"              dataType="String"/>
+  
+    <!-- Processing Data Defs -->
+    <contextDataDef name="helloWorld"                 dataType="String"     defaultDataExpression="${helloWorkflow}"></contextDataDef>
+    
+</workflow>
